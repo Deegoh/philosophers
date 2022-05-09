@@ -9,7 +9,7 @@ RESET = \e[0m
 NAME = philo
 CC = gcc
 CFLAGS = -Werror -Wall -Wextra -g -fsanitize=address
-SRC = philosophers.c
+SRC = philo.c
 RM = rm -f
 OBJ = $(SRC:.c=.o)
 
