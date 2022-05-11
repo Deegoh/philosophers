@@ -8,29 +8,36 @@ RESET = \e[0m
 #philosophers
 NAME = philo
 CC = gcc
-CFLAGS = -Werror -Wall -Wextra -g -fsanitize=address
-SRC = philo.c
-RM = rm -f
-OBJ = $(SRC:.c=.o)
+RM = rm -rf
+S = src/
+O = obj/
+I = inc/
+SRC = $Sphilo.c
+CFLAGS = -Werror -Wall -Wextra
+CFLAGS += -g -fsanitize=address
+CFLAGS += -I$I
+
+OBJ = $(SRC:$S.c=$O.o)
 
 .PHONY: all clean fclean re
 
 all: $(NAME)
 
-$(NAME): $(OBJ)
+$O:
+	@printf "$(GREEN)🚀 Creating $(O)$(RESET)\n"
+	@mkdir -p $@
+
+$(NAME): $(OBJ) | $O
 	@$(CC) $(OBJ) $(CFLAGS) -o $(NAME)
 	@printf "$(GREEN)🚀 Creating $(NAME)$(RESET)\n"
-	@sleep 0.5
 
 clean:
-	@$(RM) $(NAME)
-	@$(RM) $(OBJ)
+	@$(RM) $(O)
 	@printf "$(YELLOW)♻️  Clean $(NAME)$(RESET)\n"
-	@sleep 0.5
 
 fclean: clean
+	@$(RM) $(NAME)
 	@printf "\r$(RED)🗑️  Remove $(NAME)$(RESET)\n"
-	@sleep 0.5
 
 re: fclean all
 
