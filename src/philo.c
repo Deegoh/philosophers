@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/11 11:16:10 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/11 17:16:23 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,6 @@ size_t	put_str(char *str)
 	return (write(1, str, ft_strlen(str)));
 }
 
-void	error_msg(char *str)
-{
-	put_str(str);
-	exit(EXIT_FAILURE);
-}
-
 void	put_nbr(int nbr)
 {
 	long	l_nbr;
@@ -60,23 +54,45 @@ void	put_nbr(int nbr)
 	}
 }
 
-void	set_arg(t_arg *arg, char **av)
+int	set_arg(t_arg *arg, char **av)
 {
+	int	ret;
+
+	ret = 0;
 	arg->nbr_philo = atoi(av[1]);
+	if (arg->nbr_philo <= 0)
+		ret = 1;
 	arg->time_to_die = atoi(av[2]);
+	if (arg->time_to_die <= 0)
+		ret = 2;
 	arg->time_to_eat = atoi(av[3]);
+	if (arg->time_to_eat <= 0)
+		ret = 3;
 	arg->time_to_sleep = atoi(av[4]);
+	if (arg->time_to_sleep <= 0)
+		ret = 4;
 	arg->nbr_meals = 0;
 	if (av[5])
 		arg->nbr_meals = atoi(av[5]);
+	if (arg->nbr_meals < 0)
+		ret = 5;
+	return (ret);
 }
 
 int	main(int ac, char **av)
 {
-	t_arg	arg;
+	t_arg		arg;
+	pthread_t	philo;
 
 	if (ac > 6 || ac < 5)
-		error_msg("bad arguments\n");
-	set_arg(&arg, av);
+	{
+		printf("bad arguments\n");
+		return (EXIT_FAILURE);
+	}
+	if (!set_arg(&arg, av))
+	{
+		set_arg(&arg, av);
+		return (EXIT_FAILURE);
+	}
 	return (EXIT_SUCCESS);
 }
