@@ -24,20 +24,24 @@ OBJ = $(SRC:$S.c=$O.o)
 all: $(NAME)
 
 $O:
-	@printf "$(GREEN)🚀 Creating $(O)$(RESET)\n"
 	@mkdir -p $@
+	@printf "$(GREEN)🚀 Creating $(O)$(RESET)\n"
+	@sleep 0.2
 
 $(NAME): $(OBJ) | $O
 	@$(CC) $(OBJ) $(CFLAGS) -o $(NAME)
 	@printf "$(GREEN)🚀 Creating $(NAME)$(RESET)\n"
+	@sleep 0.2
 
 clean:
 	@$(RM) $(O)
 	@printf "$(YELLOW)♻️  Clean $(NAME)$(RESET)\n"
+	@sleep 0.2
 
 fclean: clean
 	@$(RM) $(NAME)
 	@printf "\r$(RED)🗑️  Remove $(NAME)$(RESET)\n"
+	@sleep 0.2
 
 re: fclean all
 

@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:25 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/11 10:11:35 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/11 11:13:08 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@
 # include <unistd.h>
 # include <pthread.h>
 # include <limits.h>
+# include <stdio.h>
 
 typedef struct s_arg
 {

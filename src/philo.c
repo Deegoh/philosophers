@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/11 11:06:21 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/11 11:16:10 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,10 +60,23 @@ void	put_nbr(int nbr)
 	}
 }
 
+void	set_arg(t_arg *arg, char **av)
+{
+	arg->nbr_philo = atoi(av[1]);
+	arg->time_to_die = atoi(av[2]);
+	arg->time_to_eat = atoi(av[3]);
+	arg->time_to_sleep = atoi(av[4]);
+	arg->nbr_meals = 0;
+	if (av[5])
+		arg->nbr_meals = atoi(av[5]);
+}
+
 int	main(int ac, char **av)
 {
+	t_arg	arg;
+
 	if (ac > 6 || ac < 5)
 		error_msg("bad arguments\n");
-	(void)av;
+	set_arg(&arg, av);
 	return (EXIT_SUCCESS);
 }
