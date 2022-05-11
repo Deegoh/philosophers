@@ -35,7 +35,7 @@ $(NAME): $(OBJ) | $O
 
 clean:
 	@$(RM) $(O)
-	@printf "$(YELLOW)♻️  Clean $(NAME)$(RESET)\n"
+	@printf "$(YELLOW)♻️  Clean $(O)$(RESET)\n"
 	@sleep 0.2
 
 fclean: clean
