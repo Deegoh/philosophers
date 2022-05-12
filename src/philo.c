@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/11 17:16:23 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/12 16:55:36 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,11 +54,25 @@ void	put_nbr(int nbr)
 	}
 }
 
+int	check_arg(char **av)
+{
+	int	i;
+
+	i = -1;
+	while (av[++i])
+		if (atol(av[i]) > INT_MAX)
+			return (7);
+	return (0);
+}
+
 int	set_arg(t_arg *arg, char **av)
 {
 	int	ret;
 
 	ret = 0;
+	ret = check_arg(av);
+	if (ret)
+		return (ret);
 	arg->nbr_philo = atoi(av[1]);
 	if (arg->nbr_philo <= 0)
 		ret = 1;
@@ -79,20 +93,77 @@ int	set_arg(t_arg *arg, char **av)
 	return (ret);
 }
 
+void	error_display(int error)
+{
+	if (error == 1)
+		printf("Should have more philo\n");
+	else if (error == 2)
+		printf("Time to die should be superor to zero\n");
+	else if (error == 3)
+		printf("Time to eat should be superor to zero\n");
+	else if (error == 4)
+		printf("Time to sleep should be superor to zero\n");
+	else if (error == 5)
+		printf("Number of meals should be positive\n");
+	else if (error == 6)
+		printf("bad arguments\n");
+	else if (error == 7)
+		printf("Value is over max int\n");
+}
+
+void	append(t_philo **head_ref, int id)
+{
+	t_philo	*new_node;
+	t_philo	*last;
+
+	new_node = (t_philo *)malloc(sizeof(t_philo));
+	new_node->id = id;
+	new_node->next = NULL;
+	if (*head_ref == NULL)
+	{
+		new_node->prev = NULL;
+		*head_ref = new_node;
+		return ;
+	}
+	last = *head_ref;
+	while (last->next != NULL)
+		last = last->next;
+	last->next = new_node;
+	new_node->prev = last;
+	return ;
+}
+
+void	init_sim(t_arg *sim)
+{
+	int	id;
+
+	// sim->philo = malloc(sizeof(t_philo) * sim->nbr_philo);
+	sim->philo = NULL;
+	id = -1;
+	while (++id < sim->nbr_philo)
+		append(&sim->philo, id);
+}
+
 int	main(int ac, char **av)
 {
-	t_arg		arg;
-	pthread_t	philo;
+	t_arg		sim;
+	int			check;
 
+	check = 0;
 	if (ac > 6 || ac < 5)
+		check = 6;
+	if (!check)
+		check = set_arg(&sim, av);
+	if (!check)
 	{
-		printf("bad arguments\n");
-		return (EXIT_FAILURE);
+		init_sim(&sim);
+		while (sim.philo)
+		{
+			printf("id[%d]\n", sim.philo->id);
+			sim.philo = sim.philo->next;
+		}
+		return (EXIT_SUCCESS);
 	}
-	if (!set_arg(&arg, av))
-	{
-		set_arg(&arg, av);
-		return (EXIT_FAILURE);
-	}
-	return (EXIT_SUCCESS);
+	error_display(check);
+	return (EXIT_FAILURE);
 }
