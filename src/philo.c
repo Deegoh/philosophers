@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/12 16:55:36 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/16 09:42:42 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,6 +109,8 @@ void	error_display(int error)
 		printf("bad arguments\n");
 	else if (error == 7)
 		printf("Value is over max int\n");
+	else if (error == 8)
+		printf("Thread error\n");
 }
 
 void	append(t_philo **head_ref, int id)
@@ -133,15 +135,36 @@ void	append(t_philo **head_ref, int id)
 	return ;
 }
 
-void	init_sim(t_arg *sim)
+void	*ft_test(void *arg)
+{
+	// printf("philo created\n");
+	(void)arg;
+	return (NULL);
+}
+
+int	init_fork()
+{
+	
+}
+
+int	init_thread(t_arg *sim)
 {
 	int	id;
+	int	check;
 
-	// sim->philo = malloc(sizeof(t_philo) * sim->nbr_philo);
+	check = 0;
 	sim->philo = NULL;
 	id = -1;
 	while (++id < sim->nbr_philo)
 		append(&sim->philo, id);
+	while (sim->philo)
+	{
+		check = pthread_create(&sim->philo->thread, NULL, &ft_test, NULL);
+		if (!check)
+			return (8);
+		sim->philo = sim->philo->next;
+	}
+	return (0);
 }
 
 int	main(int ac, char **av)
@@ -155,15 +178,11 @@ int	main(int ac, char **av)
 	if (!check)
 		check = set_arg(&sim, av);
 	if (!check)
-	{
-		init_sim(&sim);
-		while (sim.philo)
-		{
-			printf("id[%d]\n", sim.philo->id);
-			sim.philo = sim.philo->next;
-		}
+	check = init_fork(&sim);
+	if (!check)
+		check = init_thread(&sim);
+	if (check)
 		return (EXIT_SUCCESS);
-	}
 	error_display(check);
 	return (EXIT_FAILURE);
 }

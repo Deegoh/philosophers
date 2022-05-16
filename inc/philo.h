@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:25 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/12 16:55:35 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/16 08:15:51 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@
 typedef struct s_philo
 {
 	int				id;
-	pthread_t		philo;
+	pthread_t		thread;
 	pthread_mutex_t	fork;
 	struct s_philo	*next;
 	struct s_philo	*prev;
