@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   philo.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: tpinto-m <marvin@24lausanne.ch>            +#+  +:+       +#+        */
+/*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/16 09:42:42 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/05/17 13:42:59 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,10 +142,10 @@ void	*ft_test(void *arg)
 	return (NULL);
 }
 
-int	init_fork()
-{
+// int	init_fork()
+// {
 	
-}
+// }
 
 int	init_thread(t_arg *sim)
 {
@@ -177,8 +177,8 @@ int	main(int ac, char **av)
 		check = 6;
 	if (!check)
 		check = set_arg(&sim, av);
-	if (!check)
-	check = init_fork(&sim);
+	// if (!check)
+	// 	check = init_fork(&sim);
 	if (!check)
 		check = init_thread(&sim);
 	if (check)
