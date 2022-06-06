@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/05/17 13:42:59 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/06/06 17:58:05 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,8 @@ void	error_display(int error)
 		printf("Value is over max int\n");
 	else if (error == 8)
 		printf("Thread error\n");
+	else if (error == 9)
+		printf("Mutex error\n");
 }
 
 void	append(t_philo **head_ref, int id)
@@ -135,36 +137,69 @@ void	append(t_philo **head_ref, int id)
 	return ;
 }
 
-void	*ft_test(void *arg)
+// may be routine
+void	*ft_routine(void *arg)
 {
-	// printf("philo created\n");
-	(void)arg;
+	t_philo	*philo;
+
+	philo = (t_philo *)arg;
+	printf("id %d\n", philo->id);
+	printf("has taken forks\n");
+	printf("is eating\n");
+	printf("is sleeping\n");
+	printf("is thinking\n");
 	return (NULL);
 }
 
-// int	init_fork()
-// {
-	
-// }
+int	init_fork(t_arg *sim)
+{
+	t_philo	*tmp;
+
+	while (tmp)
+	{
+		if (pthread_mutex_init(&sim->philo->fork, NULL) != 0)
+			return (9);
+		tmp = tmp->next;
+	}
+	return (0);
+}
 
 int	init_thread(t_arg *sim)
 {
-	int	id;
-	int	check;
+	t_philo	*tmp;
+	int		check;
 
-	check = 0;
+	tmp = sim->philo;
+	while (tmp)
+	{
+		printf("it_id %d\n", tmp->id);
+		check = pthread_create(&tmp->thread, NULL, &ft_routine, (void *)&tmp);
+		if (!check)
+			return (8);
+		tmp = tmp->next;
+	}
+	return (0);
+}
+
+int	init_philo(t_arg *sim)
+{
+	int		id;
+
 	sim->philo = NULL;
 	id = -1;
 	while (++id < sim->nbr_philo)
 		append(&sim->philo, id);
-	while (sim->philo)
-	{
-		check = pthread_create(&sim->philo->thread, NULL, &ft_test, NULL);
-		if (!check)
-			return (8);
-		sim->philo = sim->philo->next;
-	}
 	return (0);
+}
+
+void	free_all(t_arg *sim)
+{
+	while (sim->philo && sim->philo->next)
+	{
+		sim->philo = sim->philo->next;
+		free(sim->philo->prev);
+	}
+	free(sim->philo);
 }
 
 int	main(int ac, char **av)
@@ -177,10 +212,19 @@ int	main(int ac, char **av)
 		check = 6;
 	if (!check)
 		check = set_arg(&sim, av);
-	// if (!check)
-	// 	check = init_fork(&sim);
+	printf("philo init -> ");
+	if (!check)
+		check = init_philo(&sim);
+	printf("finish\n");
+	printf("fork init -> ");
+	if (!check)
+		check = init_fork(&sim);
+	printf("finish\n");
+	printf("thread init\n");
 	if (!check)
 		check = init_thread(&sim);
+	printf("thread finish\n");
+	free_all(&sim);
 	if (check)
 		return (EXIT_SUCCESS);
 	error_display(check);
