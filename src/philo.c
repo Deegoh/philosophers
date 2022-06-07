@@ -98,11 +98,11 @@ void	error_display(int error)
 	if (error == 1)
 		printf("Should have more philo\n");
 	else if (error == 2)
-		printf("Time to die should be superor to zero\n");
+		printf("Time to die should be superior to zero\n");
 	else if (error == 3)
-		printf("Time to eat should be superor to zero\n");
+		printf("Time to eat should be superior to zero\n");
 	else if (error == 4)
-		printf("Time to sleep should be superor to zero\n");
+		printf("Time to sleep should be superior to zero\n");
 	else if (error == 5)
 		printf("Number of meals should be positive\n");
 	else if (error == 6)
@@ -113,6 +113,8 @@ void	error_display(int error)
 		printf("Thread error\n");
 	else if (error == 9)
 		printf("Mutex error\n");
+	else if (error == 10)
+		printf("Malloc error\n");
 }
 
 void	append(t_philo **head_ref, int id)
@@ -137,17 +139,38 @@ void	append(t_philo **head_ref, int id)
 	return ;
 }
 
+void	take_forks(t_arg	*sim)
+{
+	printf("%d has taken forks\n", sim->philo->id);
+}
+
+void	eat(t_arg	*sim)
+{
+	sim->philo->count_meal++;
+	printf("meal %d\n", sim->philo->count_meal);
+	take_forks(sim);
+//	printf("%d has taken forks\n", sim->philo->id);
+	printf("%d is eating\n", sim->philo->id);
+//	usleep(100000);
+}
+
 // may be routine
 void	*ft_routine(void *arg)
 {
-	t_philo	*philo;
+	t_arg	*sim;
 
-	philo = (t_philo *)arg;
-	printf("id %d\n", philo->id);
-	printf("has taken forks\n");
-	printf("is eating\n");
-	printf("is sleeping\n");
-	printf("is thinking\n");
+	sim = (t_arg *)arg;
+	while ((sim->philo->count_meal < sim->nbr_meals || !sim->nbr_meals)
+		&& !sim->philo->is_dead)
+	{
+		if (sim->philo->id % 2 == 0)
+			usleep(100);
+		eat(sim);
+	//	sleep();
+	//	think();
+	//	printf("%d is sleeping\n", sim->philo->id);
+	//	printf("%d is thinking\n", sim->philo->id);
+	}
 	return (NULL);
 }
 
@@ -169,10 +192,12 @@ int	init_thread(t_arg *sim)
 
 	while (sim->philo)
 	{
-		printf("init_thread_id %d\n", sim->philo->id);
-		check = pthread_create(&sim->philo->thread, NULL, &ft_routine, (void *)&sim->philo);
-		if (!check)
+//		printf("\033[0;3%dm init_thread_id %d\033[0m\n", sim->philo->id, sim->philo->id);
+		check = pthread_create(&sim->philo->thread, NULL, &ft_routine, (void *)sim);
+		if (check != 0)
 			return (8);
+		// remove join
+		pthread_join(sim->philo->thread, NULL);
 		sim->philo = sim->philo->next;
 	}
 	sim->philo = sim->head;
@@ -187,48 +212,49 @@ int	init_philo(t_arg *sim)
 	id = -1;
 	while (++id < sim->nbr_philo)
 		append(&sim->philo, id);
+	sim->head = sim->philo;
+	while (sim->philo)
+	{
+		sim->philo->count_meal = 0;
+		sim->philo->is_dead = 0;
+		sim->philo = sim->philo->next;
+	}
+	sim->philo = sim->head;
 	return (0);
 }
 
 void	free_all(t_arg *sim)
 {
+	sim->philo = sim->head;
 	while (sim->philo && sim->philo->next)
 	{
 		sim->philo = sim->philo->next;
 		free(sim->philo->prev);
 	}
 	free(sim->philo);
+	free(sim);
 }
 
 int	main(int ac, char **av)
 {
-	t_arg		sim;
+	t_arg		*sim;
 	int			check;
 
 	check = 0;
 	if (ac > 6 || ac < 5)
 		check = 6;
+	sim = malloc(sizeof(t_arg));
+	if (!sim)
+		check = 10;
 	if (!check)
-		check = set_arg(&sim, av);
-	printf("philo init -> ");
+		check = set_arg(sim, av);
 	if (!check)
-		check = init_philo(&sim);
-	sim.head = sim.philo;
-	printf("finish\n");
-	printf("fork init -> ");
+		check = init_philo(sim);
 	if (!check)
-		check = init_fork(&sim);
-	printf("finish\n");
-	printf("thread init\n");
+		check = init_fork(sim);
 	if (!check)
-		check = init_thread(&sim);
-	printf("thread finish\n");
-	while (sim.philo)
-	{
-		printf("%d\n", sim.philo->id);
-		sim.philo = sim.philo->next;
-	}
-	free_all(&sim);
+		check = init_thread(sim);
+	free_all(sim);
 	if (check)
 		return (EXIT_SUCCESS);
 	error_display(check);

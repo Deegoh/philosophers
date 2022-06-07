@@ -22,6 +22,8 @@
 typedef struct s_philo
 {
 	int				id;
+	int				is_dead;
+	int				count_meal;
 	pthread_t		thread;
 	pthread_mutex_t	fork;
 	struct s_philo	*next;
