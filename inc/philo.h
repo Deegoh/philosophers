@@ -36,6 +36,7 @@ typedef struct s_arg
 	int		time_to_sleep;
 	int		nbr_meals;
 	t_philo	*philo;
+	t_philo	*head;
 }	t_arg;
 
 #endif

@@ -153,31 +153,29 @@ void	*ft_routine(void *arg)
 
 int	init_fork(t_arg *sim)
 {
-	t_philo	*tmp;
-
-	while (tmp)
+	while (sim->philo)
 	{
 		if (pthread_mutex_init(&sim->philo->fork, NULL) != 0)
 			return (9);
-		tmp = tmp->next;
+		sim->philo = sim->philo->next;
 	}
+	sim->philo = sim->head;
 	return (0);
 }
 
 int	init_thread(t_arg *sim)
 {
-	t_philo	*tmp;
 	int		check;
 
-	tmp = sim->philo;
-	while (tmp)
+	while (sim->philo)
 	{
-		printf("it_id %d\n", tmp->id);
-		check = pthread_create(&tmp->thread, NULL, &ft_routine, (void *)&tmp);
+		printf("init_thread_id %d\n", sim->philo->id);
+		check = pthread_create(&sim->philo->thread, NULL, &ft_routine, (void *)&sim->philo);
 		if (!check)
 			return (8);
-		tmp = tmp->next;
+		sim->philo = sim->philo->next;
 	}
+	sim->philo = sim->head;
 	return (0);
 }
 
@@ -215,6 +213,7 @@ int	main(int ac, char **av)
 	printf("philo init -> ");
 	if (!check)
 		check = init_philo(&sim);
+	sim.head = sim.philo;
 	printf("finish\n");
 	printf("fork init -> ");
 	if (!check)
@@ -224,6 +223,11 @@ int	main(int ac, char **av)
 	if (!check)
 		check = init_thread(&sim);
 	printf("thread finish\n");
+	while (sim.philo)
+	{
+		printf("%d\n", sim.philo->id);
+		sim.philo = sim.philo->next;
+	}
 	free_all(&sim);
 	if (check)
 		return (EXIT_SUCCESS);
