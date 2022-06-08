@@ -39,6 +39,21 @@ typedef struct s_arg
 	int		nbr_meals;
 	t_philo	*philo;
 	t_philo	*head;
+	t_philo	*tail;
 }	t_arg;
+
+size_t	ft_strlen(char *str);
+void	append(t_philo **head_ref, int id);
+
+int		check_arg(char **av);
+void	error_display(int error);
+void	free_all(t_arg *sim);
+
+int		set_arg(t_arg *arg, char **av);
+int		init_philo(t_arg *sim);
+int		init_thread(t_arg *sim);
+int		init_fork(t_arg *sim);
+
+void	*ft_routine(void *arg);
 
 #endif

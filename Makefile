@@ -12,7 +12,10 @@ RM = rm -rf
 S = src/
 O = obj/
 I = inc/
-SRC = $Sphilo.c
+SRC =	$Sphilo.c\
+		$Serror.c\
+		$Sinit.c\
+		$Sutils.c
 CFLAGS = -Werror -Wall -Wextra
 CFLAGS += -g -fsanitize=address
 CFLAGS += -I$I
@@ -35,12 +38,12 @@ $(NAME): $(OBJ) | $O
 
 clean:
 	@$(RM) $(O)
-	@printf "$(YELLOW)♻️  Clean $(O)$(RESET)\n"
+	@printf "$(YELLOW)♻️ Clean $(O)$(RESET)\n"
 	@sleep 0.2
 
 fclean: clean
 	@$(RM) $(NAME)
-	@printf "\r$(RED)🗑️  Remove $(NAME)$(RESET)\n"
+	@printf "$(RED)🗑️ Remove $(NAME)$(RESET)\n"
 	@sleep 0.2
 
 re: fclean all
