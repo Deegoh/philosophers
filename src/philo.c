@@ -41,8 +41,8 @@ void	*ft_routine(void *arg)
 		eat(sim);
 	//	sleep();
 	//	think();
-	//	printf("%d is sleeping\n", sim->philo->id);
-	//	printf("%d is thinking\n", sim->philo->id);
+		printf("%d is sleeping\n", sim->philo->id);
+		printf("%d is thinking\n", sim->philo->id);
 	}
 	return (NULL);
 }
@@ -66,8 +66,9 @@ int	main(int ac, char **av)
 		check = init_fork(sim);
 	if (!check)
 		check = init_thread(sim);
-	free_all(sim);
-	if (check)
+	if (check > 7)
+		free_all(sim);
+	if (!check)
 		return (EXIT_SUCCESS);
 	error_display(check);
 	return (EXIT_FAILURE);

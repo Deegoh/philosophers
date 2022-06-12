@@ -44,6 +44,8 @@ typedef struct s_arg
 
 size_t	ft_strlen(char *str);
 void	append(t_philo **head_ref, int id);
+int		ft_atoi(const char *str);
+int		ft_isdigit(int c);
 
 int		check_arg(char **av);
 void	error_display(int error);

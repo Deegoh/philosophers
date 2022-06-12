@@ -12,30 +12,46 @@
 
 #include "philo.h"
 
+int	check_digit(char	**av)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	while (av[++i])
+	{
+		j = -1;
+		while (av[i][++j])
+		{
+			if (!ft_isdigit(av[i][j]))
+				return (7);
+		}
+	}
+	return (0);
+}
+
 int	set_arg(t_arg *arg, char **av)
 {
 	int	ret;
 
 	ret = 0;
-	ret = check_arg(av);
-	if (ret)
-		return (ret);
-	arg->nbr_philo = atoi(av[1]);
+	ret = check_digit(av);
+	arg->nbr_philo = ft_atoi(av[1]);
 	if (arg->nbr_philo <= 0)
 		ret = 1;
-	arg->time_to_die = atoi(av[2]);
+	arg->time_to_die = ft_atoi(av[2]);
 	if (arg->time_to_die <= 0)
 		ret = 2;
-	arg->time_to_eat = atoi(av[3]);
+	arg->time_to_eat = ft_atoi(av[3]);
 	if (arg->time_to_eat <= 0)
 		ret = 3;
-	arg->time_to_sleep = atoi(av[4]);
+	arg->time_to_sleep = ft_atoi(av[4]);
 	if (arg->time_to_sleep <= 0)
 		ret = 4;
 	arg->nbr_meals = 0;
 	if (av[5])
-		arg->nbr_meals = atoi(av[5]);
-	if (arg->nbr_meals < 0)
+		arg->nbr_meals = ft_atoi(av[5]);
+	if (arg->nbr_meals <= 0)
 		ret = 5;
 	return (ret);
 }
@@ -79,6 +95,8 @@ int	init_thread(t_arg *sim)
 		if (check != 0)
 			return (8);
 		// remove join
+		pthread_join(sim->philo->thread, NULL);
+		//
 		sim->philo = sim->philo->next;
 	}
 	sim->philo = sim->head;
