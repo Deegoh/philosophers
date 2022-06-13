@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 09:11:35 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/06/12 16:20:50 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/06/13 23:21:31 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,16 +38,13 @@ void	error_display(int error)
 
 void	free_all(t_arg *sim)
 {
-	//TODO wip
 	sim->philo = sim->head;
 	while (sim->philo && sim->philo->next)
 	{
-//		free(sim->philo->thread);
+		pthread_mutex_destroy(&sim->philo->fork);
 		sim->philo = sim->philo->next;
 		free(sim->philo->prev);
 	}
 	free(sim->philo);
-	free(sim->head);
-	free(sim->tail);
 	free(sim);
 }

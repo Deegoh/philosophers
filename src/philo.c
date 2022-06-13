@@ -6,82 +6,87 @@
 /*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/06/06 17:58:05 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/06/13 23:59:49 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	take_forks(t_arg	*sim)
+size_t	get_time(void)
 {
-	printf("%d has taken forks\n", sim->philo->id);
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void	eat(t_arg	*sim)
+void	eating(t_arg	*sim)
 {
+	size_t	delta;
+
+	pthread_mutex_lock(&sim->philo->fork);
+	if (sim->philo == sim->tail)
+		pthread_mutex_lock(&sim->head->fork);
+	else
+		pthread_mutex_lock(&sim->philo->next->fork);
+	printf("%*ld %d has taken forks\n", 5,
+		get_time() - sim->philo->start_time, sim->philo->id);
+	printf("%*ld %d is eating\n", 5,
+		get_time() - sim->philo->start_time, sim->philo->id);
+	delta = get_time();
+	while (1)
+	{
+		if ((get_time() - delta) >= (size_t)sim->time_to_eat)
+			break ;
+		usleep(100);
+	}
+	pthread_mutex_unlock(&sim->philo->fork);
+	if (sim->philo == sim->tail)
+		pthread_mutex_unlock(&sim->head->fork);
+	else
+		pthread_mutex_unlock(&sim->philo->next->fork);
 	sim->philo->count_meal++;
-	printf("meal %d\n", sim->philo->count_meal);
-	take_forks(sim);
-	printf("%d has taken forks\n", sim->philo->id);
-	printf("%d is eating\n", sim->philo->id);
-	usleep(100000);
 }
 
-long	get_time(void)
+void	sleeping(t_arg	*sim)
 {
-	struct timeval	tp;
-	long			milliseconds;
+	size_t	delta;
 
-	gettimeofday(&tp, NULL);
-	milliseconds = tp.tv_sec * 1000;
-	milliseconds += tp.tv_usec / 1000;
-	return (milliseconds);
+	pthread_mutex_lock(&sim->prt);
+	printf("%*ld %d  is sleeping\n", 5,
+		get_time() - sim->philo->start_time, sim->philo->id);
+	pthread_mutex_unlock(&sim->prt);
+	delta = get_time();
+	while (1)
+	{
+		if ((get_time() - delta) >= (size_t)sim->time_to_sleep)
+			break ;
+		usleep(100);
+	}
 }
 
-// may be routine
+void	thinking(t_arg	*sim)
+{
+	pthread_mutex_lock(&sim->prt);
+	printf("%*ld %d  is thinking\n", 5,
+		get_time() - sim->philo->start_time, sim->philo->id);
+	pthread_mutex_unlock(&sim->prt);
+}
+
 void	*ft_routine(void *arg)
 {
 	t_arg	*sim;
 
 	sim = (t_arg *)arg;
+	sim->philo->start_time = get_time();
 	while ((sim->philo->count_meal < sim->nbr_meals || !sim->nbr_meals)
 		&& !sim->philo->is_dead)
 	{
 		if (sim->philo->id % 2 == 0)
-			usleep(100);
-		eat(sim);
-	//	sleep();
-	//	think();
-		printf("%d is sleeping\n", sim->philo->id);
-		printf("%d is thinking\n", sim->philo->id);
+			usleep(1000);
+		eating(sim);
+		sleeping(sim);
+		thinking(sim);
 	}
 	return (NULL);
-}
-
-int	main(int ac, char **av)
-{
-	t_arg		*sim;
-	int			check;
-
-	check = 0;
-	if (ac > 6 || ac < 5)
-		check = 6;
-	sim = malloc(sizeof(t_arg));
-	if (!sim)
-		check = 10;
-	if (!check)
-		check = set_arg(sim, av);
-	if (!check)
-		check = init_philo(sim);
-	if (!check)
-		check = init_fork(sim);
-	if (!check)
-		check = init_thread(sim);
-	printf("sim finish\n");
-	if (check > 7)
-		free_all(sim);
-	if (!check)
-		return (EXIT_SUCCESS);
-	error_display(check);
-	return (EXIT_FAILURE);
 }

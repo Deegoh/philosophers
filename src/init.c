@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/08 09:07:46 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/06/08 09:07:48 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/06/14 00:00:35 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ int	set_arg(t_arg *arg, char **av)
 	arg->nbr_meals = 0;
 	if (av[5])
 		arg->nbr_meals = ft_atoi(av[5]);
-	if (arg->nbr_meals <= 0)
+	if (arg->nbr_meals < 0)
 		ret = 5;
 	return (ret);
 }
@@ -74,6 +74,8 @@ int	init_philo(t_arg *sim)
 
 int	init_fork(t_arg *sim)
 {
+	if (pthread_mutex_init(&sim->prt, NULL) != 0)
+		return (9);
 	while (sim->philo)
 	{
 		if (pthread_mutex_init(&sim->philo->fork, NULL) != 0)
@@ -90,21 +92,13 @@ int	init_thread(t_arg *sim)
 
 	while (sim->philo)
 	{
-		printf("\033[0;3%dm init_thread_id %d\033[0m\n", sim->philo->id, sim->philo->id);
-		check = pthread_create(&sim->philo->thread, NULL, &ft_routine, (void *)sim);
+		check = pthread_create(&sim->philo->thread, NULL,
+				&ft_routine, (void *)sim);
 		if (check != 0)
 			return (8);
-		// remove join
 		pthread_join(sim->philo->thread, NULL);
-		//
 		sim->philo = sim->philo->next;
 	}
 	sim->philo = sim->head;
-//	while (sim->philo)
-//	{
-//		pthread_join(sim->philo->thread, NULL);
-//		sim->philo = sim->philo->next;
-//	}
-//	sim->philo = sim->head;
 	return (0);
 }

@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:25 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/06/06 15:36:24 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/06/13 23:19:57 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct s_philo
 	int				id;
 	int				is_dead;
 	int				count_meal;
+	size_t			start_time;
 	pthread_t		thread;
 	pthread_mutex_t	fork;
 	struct s_philo	*next;
@@ -33,14 +34,15 @@ typedef struct s_philo
 
 typedef struct s_arg
 {
-	int		nbr_philo;
-	int		time_to_die;
-	int		time_to_eat;
-	int		time_to_sleep;
-	int		nbr_meals;
-	t_philo	*philo;
-	t_philo	*head;
-	t_philo	*tail;
+	int				nbr_philo;
+	int				time_to_die;
+	int				time_to_eat;
+	int				time_to_sleep;
+	int				nbr_meals;
+	pthread_mutex_t	prt;
+	t_philo			*philo;
+	t_philo			*head;
+	t_philo			*tail;
 }	t_arg;
 
 size_t	ft_strlen(char *str);
@@ -48,7 +50,6 @@ void	append(t_philo **head_ref, int id);
 int		ft_atoi(const char *str);
 int		ft_isdigit(int c);
 
-int		check_arg(char **av);
 void	error_display(int error);
 void	free_all(t_arg *sim);
 
@@ -58,5 +59,5 @@ int		init_thread(t_arg *sim);
 int		init_fork(t_arg *sim);
 
 void	*ft_routine(void *arg);
-
+size_t	get_time(void);
 #endif

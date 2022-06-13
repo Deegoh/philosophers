@@ -2,3 +2,4 @@
 philo
 *.dSYM
 .vscode
+.idea
