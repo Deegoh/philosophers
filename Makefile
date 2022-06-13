@@ -17,7 +17,7 @@ SRC =	$Sphilo.c\
 		$Sinit.c\
 		$Sutils.c
 CFLAGS = -Werror -Wall -Wextra
-CFLAGS += -g -fsanitize=address
+CFLAGS += -g -fsanitize=address #-fsanitize=leak
 CFLAGS += -I$I
 
 OBJ = $(SRC:$S.c=$O.o)

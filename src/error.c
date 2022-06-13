@@ -38,12 +38,16 @@ void	error_display(int error)
 
 void	free_all(t_arg *sim)
 {
+	//TODO wip
 	sim->philo = sim->head;
 	while (sim->philo && sim->philo->next)
 	{
+//		free(sim->philo->thread);
 		sim->philo = sim->philo->next;
 		free(sim->philo->prev);
 	}
 	free(sim->philo);
+	free(sim->head);
+	free(sim->tail);
 	free(sim);
 }

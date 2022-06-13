@@ -18,6 +18,7 @@
 # include <pthread.h>
 # include <limits.h>
 # include <stdio.h>
+# include <sys/time.h>
 
 typedef struct s_philo
 {

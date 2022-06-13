@@ -27,6 +27,17 @@ void	eat(t_arg	*sim)
 	usleep(100000);
 }
 
+long	get_time(void)
+{
+	struct timeval	tp;
+	long			milliseconds;
+
+	gettimeofday(&tp, NULL);
+	milliseconds = tp.tv_sec * 1000;
+	milliseconds += tp.tv_usec / 1000;
+	return (milliseconds);
+}
+
 // may be routine
 void	*ft_routine(void *arg)
 {
@@ -66,6 +77,7 @@ int	main(int ac, char **av)
 		check = init_fork(sim);
 	if (!check)
 		check = init_thread(sim);
+	printf("sim finish\n");
 	if (check > 7)
 		free_all(sim);
 	if (!check)
