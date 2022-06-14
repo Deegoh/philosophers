@@ -66,16 +66,17 @@ int	init_philo(t_arg *sim)
 		append(&sim->philo, id);
 	sim->head = sim->philo;
 	while (sim->philo)
+	{
+		sim->philo->sim = sim;
+		sim->tail = sim->philo;
 		sim->philo = sim->philo->next;
-	sim->tail = sim->philo;
+	}
 	sim->philo = sim->head;
 	return (0);
 }
 
 int	init_fork(t_arg *sim)
 {
-	if (pthread_mutex_init(&sim->prt, NULL) != 0)
-		return (9);
 	while (sim->philo)
 	{
 		if (pthread_mutex_init(&sim->philo->fork, NULL) != 0)
@@ -93,9 +94,14 @@ int	init_thread(t_arg *sim)
 	while (sim->philo)
 	{
 		check = pthread_create(&sim->philo->thread, NULL,
-				&ft_routine, (void *)sim);
+				&ft_routine, (void *)sim->philo);
 		if (check != 0)
 			return (8);
+		sim->philo = sim->philo->next;
+	}
+	sim->philo = sim->head;
+	while (sim->philo)
+	{
 		pthread_join(sim->philo->thread, NULL);
 		sim->philo = sim->philo->next;
 	}

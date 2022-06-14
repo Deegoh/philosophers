@@ -12,81 +12,55 @@
 
 #include "philo.h"
 
-size_t	get_time(void)
+void	eating(t_philo	*philo)
 {
-	struct timeval	time;
-
-	gettimeofday(&time, NULL);
-	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
-}
-
-void	eating(t_arg	*sim)
-{
-	size_t	delta;
-
-	pthread_mutex_lock(&sim->philo->fork);
-	if (sim->philo == sim->tail)
-		pthread_mutex_lock(&sim->head->fork);
+	pthread_mutex_lock(&philo->fork);
+	printf("%*ld %d has taken a fork\n", 5,
+		get_time() - philo->start_time, philo->id);
+	if (philo == philo->sim->tail)
+		pthread_mutex_lock(&philo->sim->head->fork);
 	else
-		pthread_mutex_lock(&sim->philo->next->fork);
-	printf("%*ld %d has taken forks\n", 5,
-		get_time() - sim->philo->start_time, sim->philo->id);
+		pthread_mutex_lock(&philo->next->fork);
+	printf("%*ld %d has taken a fork\n", 5,
+		get_time() - philo->start_time, philo->id);
 	printf("%*ld %d is eating\n", 5,
-		get_time() - sim->philo->start_time, sim->philo->id);
-	delta = get_time();
-	while (1)
-	{
-		if ((get_time() - delta) >= (size_t)sim->time_to_eat)
-			break ;
-		usleep(100);
-	}
-	pthread_mutex_unlock(&sim->philo->fork);
-	if (sim->philo == sim->tail)
-		pthread_mutex_unlock(&sim->head->fork);
+		get_time() - philo->start_time, philo->id);
+	waiting(philo, (size_t)philo->sim->time_to_eat);
+	pthread_mutex_unlock(&philo->fork);
+	if (philo == philo->sim->tail)
+		pthread_mutex_unlock(&philo->sim->head->fork);
 	else
-		pthread_mutex_unlock(&sim->philo->next->fork);
-	sim->philo->count_meal++;
+		pthread_mutex_unlock(&philo->next->fork);
+	philo->count_meal++;
 }
 
-void	sleeping(t_arg	*sim)
+void	sleeping(t_philo	*philo)
 {
-	size_t	delta;
-
-	pthread_mutex_lock(&sim->prt);
-	printf("%*ld %d  is sleeping\n", 5,
-		get_time() - sim->philo->start_time, sim->philo->id);
-	pthread_mutex_unlock(&sim->prt);
-	delta = get_time();
-	while (1)
-	{
-		if ((get_time() - delta) >= (size_t)sim->time_to_sleep)
-			break ;
-		usleep(100);
-	}
+	printf("%*ld %d is sleeping\n", 5,
+		get_time() - philo->start_time, philo->id);
+	waiting(philo, (size_t)philo->sim->time_to_sleep);
 }
 
-void	thinking(t_arg	*sim)
+void	thinking(t_philo	*philo)
 {
-	pthread_mutex_lock(&sim->prt);
-	printf("%*ld %d  is thinking\n", 5,
-		get_time() - sim->philo->start_time, sim->philo->id);
-	pthread_mutex_unlock(&sim->prt);
+	printf("%*ld %d is thinking\n", 5,
+		get_time() - philo->start_time, philo->id);
 }
 
 void	*ft_routine(void *arg)
 {
-	t_arg	*sim;
+	t_philo	*philo;
 
-	sim = (t_arg *)arg;
-	sim->philo->start_time = get_time();
-	while ((sim->philo->count_meal < sim->nbr_meals || !sim->nbr_meals)
-		&& !sim->philo->is_dead)
+	philo = (t_philo *)arg;
+	philo->start_time = get_time();
+	while ((philo->count_meal < philo->sim->nbr_meals || !philo->sim->nbr_meals)
+		&& !philo->is_dead)
 	{
-		if (sim->philo->id % 2 == 0)
-			usleep(1000);
-		eating(sim);
-		sleeping(sim);
-		thinking(sim);
+		if (philo->id % 2 == 0)
+			usleep(philo->sim->time_to_eat);
+		eating(philo);
+		sleeping(philo);
+		thinking(philo);
 	}
 	return (NULL);
 }

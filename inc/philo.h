@@ -30,6 +30,7 @@ typedef struct s_philo
 	pthread_mutex_t	fork;
 	struct s_philo	*next;
 	struct s_philo	*prev;
+	struct s_arg	*sim;
 }	t_philo;
 
 typedef struct s_arg
@@ -39,13 +40,13 @@ typedef struct s_arg
 	int				time_to_eat;
 	int				time_to_sleep;
 	int				nbr_meals;
-	pthread_mutex_t	prt;
 	t_philo			*philo;
 	t_philo			*head;
 	t_philo			*tail;
 }	t_arg;
 
-size_t	ft_strlen(char *str);
+void	waiting(t_philo *philo, size_t time);
+size_t	get_time(void);
 void	append(t_philo **head_ref, int id);
 int		ft_atoi(const char *str);
 int		ft_isdigit(int c);

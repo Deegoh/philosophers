@@ -12,14 +12,25 @@
 
 #include "philo.h"
 
-size_t	ft_strlen(char *str)
+void	waiting(t_philo *philo, size_t time)
 {
-	size_t	i;
+	size_t	delta;
 
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
+	delta = get_time();
+	while (!philo->is_dead)
+	{
+		if ((get_time() - delta) >= time)
+			break ;
+		usleep(100);
+	}
+}
+
+size_t	get_time(void)
+{
+	struct timeval	time;
+
+	gettimeofday(&time, NULL);
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
 void	append(t_philo **head_ref, int id)

@@ -56,7 +56,7 @@ valgrind: all
 	--show-leak-kinds=all \
 	--track-origins=yes \
 	--verbose \
-	./$(NAME) 5 1 1 1 3
+	./$(NAME) 5 410 200 200
 
 re: fclean all
 
