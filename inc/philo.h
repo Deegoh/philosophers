@@ -20,12 +20,15 @@
 # include <stdio.h>
 # include <sys/time.h>
 
+#define SPACE 9
+
 typedef struct s_philo
 {
 	int				id;
 	int				is_dead;
 	int				count_meal;
 	size_t			start_time;
+	size_t			last_meal;
 	pthread_t		thread;
 	pthread_mutex_t	fork;
 	struct s_philo	*next;

@@ -15,16 +15,17 @@
 void	eating(t_philo	*philo)
 {
 	pthread_mutex_lock(&philo->fork);
-	printf("%*ld %d has taken a fork\n", 5,
+	printf("%*ld %d has taken a fork\n", SPACE,
 		get_time() - philo->start_time, philo->id);
 	if (philo == philo->sim->tail)
 		pthread_mutex_lock(&philo->sim->head->fork);
 	else
 		pthread_mutex_lock(&philo->next->fork);
-	printf("%*ld %d has taken a fork\n", 5,
+	printf("%*ld %d has taken a fork\n", SPACE,
 		get_time() - philo->start_time, philo->id);
-	printf("%*ld %d is eating\n", 5,
+	printf("%*ld %d is eating\n", SPACE,
 		get_time() - philo->start_time, philo->id);
+	philo->last_meal = get_time();
 	waiting(philo, (size_t)philo->sim->time_to_eat);
 	pthread_mutex_unlock(&philo->fork);
 	if (philo == philo->sim->tail)
@@ -36,14 +37,20 @@ void	eating(t_philo	*philo)
 
 void	sleeping(t_philo	*philo)
 {
-	printf("%*ld %d is sleeping\n", 5,
+	printf("%*ld %d is sleeping\n", SPACE,
 		get_time() - philo->start_time, philo->id);
 	waiting(philo, (size_t)philo->sim->time_to_sleep);
 }
 
 void	thinking(t_philo	*philo)
 {
-	printf("%*ld %d is thinking\n", 5,
+	printf("%*ld %d is thinking\n", SPACE,
+		get_time() - philo->start_time, philo->id);
+}
+
+void	dying(t_philo	*philo)
+{
+	printf("%*ld %d died\n", SPACE,
 		get_time() - philo->start_time, philo->id);
 }
 
@@ -53,14 +60,20 @@ void	*ft_routine(void *arg)
 
 	philo = (t_philo *)arg;
 	philo->start_time = get_time();
+	philo->last_meal = get_time();
 	while ((philo->count_meal < philo->sim->nbr_meals || !philo->sim->nbr_meals)
 		&& !philo->is_dead)
 	{
 		if (philo->id % 2 == 0)
 			usleep(philo->sim->time_to_eat);
-		eating(philo);
-		sleeping(philo);
-		thinking(philo);
+		if (get_time() - philo->last_meal > (size_t)philo->sim->time_to_die)
+		{
+			eating(philo);
+			sleeping(philo);
+			thinking(philo);
+		}
+		else
+			dying(philo);
 	}
 	return (NULL);
 }
