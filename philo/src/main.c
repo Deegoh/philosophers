@@ -26,9 +26,9 @@ int	main(int ac, char **av)
 	if (!check)
 		check = set_arg(sim, av);
 	if (!check)
-		check = init_philo(sim);
+		check = init_sim(sim);
 	if (!check)
-		check = init_fork(sim);
+		check = init_mutex(sim);
 	if (!check)
 		check = init_thread(sim);
 	if (check > 7 || check == 0)

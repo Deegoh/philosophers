@@ -20,7 +20,7 @@
 # include <stdio.h>
 # include <sys/time.h>
 
-#define SPACE 7
+# define SPACE 7
 
 typedef struct s_philo
 {
@@ -39,12 +39,13 @@ typedef struct s_philo
 typedef struct s_arg
 {
 	int				nbr_philo;
-	int				time_to_die;
-	int				time_to_eat;
-	int				time_to_sleep;
+	size_t			time_to_die;
+	size_t			time_to_eat;
+	size_t			time_to_sleep;
 	int				nbr_meals;
+	int				eos;
 	pthread_t		reaper;
-	pthread_mutex_t	stop;
+	pthread_mutex_t	print;
 	t_philo			*philo;
 	t_philo			*head;
 	t_philo			*tail;
@@ -60,9 +61,9 @@ void	error_display(int error);
 void	free_all(t_arg *sim);
 
 int		set_arg(t_arg *arg, char **av);
-int		init_philo(t_arg *sim);
+int		init_sim(t_arg *sim);
+int		init_mutex(t_arg *sim);
 int		init_thread(t_arg *sim);
-int		init_fork(t_arg *sim);
 
 void	*ft_routine(void *arg);
 void	*ft_reaper(void *arg);

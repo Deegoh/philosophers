@@ -56,7 +56,7 @@ int	set_arg(t_arg *arg, char **av)
 	return (ret);
 }
 
-int	init_philo(t_arg *sim)
+int	init_sim(t_arg *sim)
 {
 	int		id;
 
@@ -72,12 +72,13 @@ int	init_philo(t_arg *sim)
 		sim->philo = sim->philo->next;
 	}
 	sim->philo = sim->head;
+	sim->eos = 0;
 	return (0);
 }
 
-int	init_fork(t_arg *sim)
+int	init_mutex(t_arg *sim)
 {
-	if (pthread_mutex_init(&sim->stop, NULL) != 0)
+	if (pthread_mutex_init(&sim->print, NULL) != 0)
 		return (9);
 	while (sim->philo)
 	{
@@ -110,7 +111,7 @@ int	init_thread(t_arg *sim)
 		pthread_join(sim->philo->thread, NULL);
 		sim->philo = sim->philo->next;
 	}
-//	pthread_join(sim->reaper, NULL);
+	pthread_join(sim->reaper, NULL);
 	sim->philo = sim->head;
 	return (0);
 }

@@ -14,12 +14,12 @@
 
 void	waiting(t_philo *philo, size_t time)
 {
-	size_t	delta;
+	size_t	start;
 
-	delta = get_time();
+	start = get_time();
 	while (!philo->is_dead)
 	{
-		if ((get_time() - delta) >= time)
+		if ((get_time() - start) >= time)
 			break ;
 		usleep(100);
 	}

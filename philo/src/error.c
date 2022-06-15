@@ -45,7 +45,7 @@ void	free_all(t_arg *sim)
 		sim->philo = sim->philo->next;
 		free(sim->philo->prev);
 	}
-	pthread_mutex_destroy(&sim->stop);
+	pthread_mutex_destroy(&sim->print);
 	free(sim->philo);
 	free(sim);
 }

@@ -14,19 +14,13 @@
 
 void	ft_print(t_philo	*philo, char *msg)
 {
-	if (get_time() - philo->last_meal > (size_t)philo->sim->time_to_die)
-	{
+	pthread_mutex_lock(&philo->sim->print);
+	if (get_time() - philo->last_meal > philo->sim->time_to_die)
 		philo->is_dead = 1;
-		pthread_mutex_lock(&philo->sim->stop);
-		printf("%*ld %d %s\n", SPACE,
-			get_time() - philo->start_time, philo->id, msg);
-		usleep(1000);
-		free_all(philo->sim);
-		exit(1);
-	}
-	else if (!philo->is_dead)
+	else if (!philo->is_dead && !philo->sim->eos)
 		printf("%*ld %d %s\n", SPACE, get_time() - philo->start_time,
 			philo->id, msg);
+	pthread_mutex_unlock(&philo->sim->print);
 }
 
 void	eating(t_philo	*philo)
@@ -40,7 +34,7 @@ void	eating(t_philo	*philo)
 	ft_print(philo, "has taken a fork");
 	ft_print(philo, "is eating");
 	philo->last_meal = get_time();
-	waiting(philo, (size_t)philo->sim->time_to_eat);
+	waiting(philo, philo->sim->time_to_eat);
 	pthread_mutex_unlock(&philo->fork);
 	if (philo == philo->sim->tail)
 		pthread_mutex_unlock(&philo->sim->head->fork);
@@ -51,26 +45,27 @@ void	eating(t_philo	*philo)
 
 void	*ft_reaper(void *arg)
 {
-	t_arg *sim;
+	t_arg	*sim;
 
 	sim = (t_arg *)arg;
-	while (1)
+	while (!sim->eos)
 	{
 		while (sim->philo)
 		{
-			if (sim->philo->is_dead)
+			pthread_mutex_lock(&sim->print);
+			if (sim->philo->is_dead
+				|| get_time() - sim->philo->last_meal > sim->time_to_die)
 			{
-				pthread_mutex_lock(&sim->stop);
-				printf("%*ld %d is died reaper\n", SPACE,
+				sim->eos = 1;
+				printf("%*ld %d is died\n", SPACE,
 					get_time() - sim->philo->start_time, sim->philo->id);
-				usleep(1000);
-				free_all(sim);
-				exit(1);
 			}
+			pthread_mutex_unlock(&sim->print);
 			sim->philo = sim->philo->next;
 		}
 		sim->philo = sim->head;
 	}
+	return (NULL);
 }
 
 void	*ft_routine(void *arg)
@@ -87,7 +82,7 @@ void	*ft_routine(void *arg)
 			usleep(philo->sim->time_to_eat);
 		eating(philo);
 		ft_print(philo, "is sleeping");
-		waiting(philo, (size_t)philo->sim->time_to_sleep);
+		waiting(philo, philo->sim->time_to_sleep);
 		ft_print(philo, "is thinking");
 	}
 	return (NULL);
