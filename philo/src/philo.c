@@ -6,7 +6,7 @@
 /*   By: tpinto-m <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/11 10:06:13 by tpinto-m          #+#    #+#             */
-/*   Updated: 2022/06/13 23:59:49 by tpinto-m         ###   ########.fr       */
+/*   Updated: 2022/06/15 21:27:18 by tpinto-m         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,7 @@ void	*ft_reaper(void *arg)
 				|| get_time() - sim->philo->last_meal > sim->time_to_die)
 			{
 				sim->eos = 1;
-				printf("%*ld %d is died\n", SPACE,
+				printf("%*ld %d died\n", SPACE,
 					get_time() - sim->philo->start_time, sim->philo->id);
 			}
 			pthread_mutex_unlock(&sim->print);
@@ -65,7 +65,7 @@ void	*ft_reaper(void *arg)
 		}
 		sim->philo = sim->head;
 	}
-	return (NULL);
+	exit (EXIT_FAILURE);
 }
 
 void	*ft_routine(void *arg)
@@ -80,7 +80,14 @@ void	*ft_routine(void *arg)
 	{
 		if (philo->id % 2 == 1)
 			usleep(philo->sim->time_to_eat);
-		eating(philo);
+		if (philo->sim->head == philo->sim->tail)
+		{
+			ft_print(philo, "has taken a fork");
+			waiting(philo, philo->sim->time_to_die + 1);
+			return (NULL);
+		}
+		else
+			eating(philo);
 		ft_print(philo, "is sleeping");
 		waiting(philo, philo->sim->time_to_sleep);
 		ft_print(philo, "is thinking");
