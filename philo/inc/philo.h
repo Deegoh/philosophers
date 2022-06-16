@@ -65,7 +65,8 @@ int		init_sim(t_arg *sim);
 int		init_mutex(t_arg *sim);
 int		init_thread(t_arg *sim);
 
-void	*ft_routine(void *arg);
+void	*init_philo(void *arg);
 void	*ft_reaper(void *arg);
+void	ft_routine(t_philo	*philo);
 
 #endif

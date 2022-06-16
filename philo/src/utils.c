@@ -41,7 +41,7 @@ void	append(t_philo **head_ref, int id)
 	new_node = malloc(sizeof(t_philo));
 	new_node->id = id;
 	new_node->is_dead = 0;
-	new_node->count_meal = 0;
+	new_node->count_meal = 1;
 	new_node->next = NULL;
 	if (*head_ref == NULL)
 	{

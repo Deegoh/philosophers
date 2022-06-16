@@ -40,13 +40,13 @@ int	set_arg(t_arg *arg, char **av)
 	if (arg->nbr_philo <= 0)
 		ret = 1;
 	arg->time_to_die = ft_atoi(av[2]);
-	if (arg->time_to_die <= 0)
+	if (arg->time_to_die <= 59)
 		ret = 2;
 	arg->time_to_eat = ft_atoi(av[3]);
-	if (arg->time_to_eat <= 0)
+	if (arg->time_to_eat <= 59)
 		ret = 3;
 	arg->time_to_sleep = ft_atoi(av[4]);
-	if (arg->time_to_sleep <= 0)
+	if (arg->time_to_sleep <= 59)
 		ret = 4;
 	arg->nbr_meals = 0;
 	if (av[5])
@@ -93,25 +93,27 @@ int	init_mutex(t_arg *sim)
 int	init_thread(t_arg *sim)
 {
 	int		check;
+	t_philo	*tmp;
 
-	while (sim->philo)
+	tmp = sim->philo;
+	while (tmp)
 	{
-		check = pthread_create(&sim->philo->thread, NULL,
-				&ft_routine, (void *)sim->philo);
+		check = pthread_create(&tmp->thread, NULL,
+				&init_philo, (void *)tmp);
 		if (check != 0)
 			return (8);
-		sim->philo = sim->philo->next;
+		tmp = tmp->next;
 	}
+	tmp = sim->head;
 	check = pthread_create(&sim->reaper, NULL, &ft_reaper, (void *)sim);
 	if (check != 0)
 		return (8);
-	sim->philo = sim->head;
-	while (sim->philo)
+	while (tmp)
 	{
-		pthread_join(sim->philo->thread, NULL);
-		sim->philo = sim->philo->next;
+		pthread_join(tmp->thread, NULL);
+		tmp = tmp->next;
 	}
+	tmp = sim->head;
 	pthread_join(sim->reaper, NULL);
-	sim->philo = sim->head;
 	return (0);
 }

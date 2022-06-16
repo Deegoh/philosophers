@@ -15,11 +15,15 @@
 void	ft_print(t_philo	*philo, char *msg)
 {
 	pthread_mutex_lock(&philo->sim->print);
-	if (get_time() - philo->last_meal > philo->sim->time_to_die)
-		philo->is_dead = 1;
-	else if (!philo->is_dead && !philo->sim->eos)
-		printf("%*ld %d %s\n", SPACE, get_time() - philo->start_time,
-			philo->id, msg);
+	if (!philo->is_dead && philo->sim->eos < philo->sim->nbr_philo)
+	{
+		if (msg[3] == 'e' && philo->sim->nbr_meals != 0)
+			printf("%*ld %d %s his %d meal\n", SPACE, get_time()
+				- philo->start_time, philo->id, msg, philo->count_meal);
+		else
+			printf("%*ld %d %s\n", SPACE, get_time() - philo->start_time,
+				philo->id, msg);
+	}
 	pthread_mutex_unlock(&philo->sim->print);
 }
 
@@ -40,7 +44,6 @@ void	eating(t_philo	*philo)
 		pthread_mutex_unlock(&philo->sim->head->fork);
 	else
 		pthread_mutex_unlock(&philo->next->fork);
-	philo->count_meal++;
 }
 
 void	*ft_reaper(void *arg)
@@ -48,49 +51,62 @@ void	*ft_reaper(void *arg)
 	t_arg	*sim;
 
 	sim = (t_arg *)arg;
-	while (!sim->eos)
+	while (sim->eos < sim->nbr_philo)
 	{
 		while (sim->philo)
 		{
-			pthread_mutex_lock(&sim->print);
-			if (sim->philo->is_dead
-				|| get_time() - sim->philo->last_meal > sim->time_to_die)
+			if (!sim->philo->is_dead
+				&& get_time() - sim->philo->last_meal > sim->time_to_die)
 			{
-				sim->eos = 1;
+				pthread_mutex_lock(&sim->print);
+				sim->eos = sim->nbr_philo;
 				printf("%*ld %d died\n", SPACE,
 					get_time() - sim->philo->start_time, sim->philo->id);
+				sim->philo->is_dead = 1;
+				pthread_mutex_unlock(&sim->print);
+				break ;
 			}
-			pthread_mutex_unlock(&sim->print);
 			sim->philo = sim->philo->next;
 		}
 		sim->philo = sim->head;
 	}
-	exit (EXIT_FAILURE);
+	return (NULL);
 }
 
-void	*ft_routine(void *arg)
+void	ft_routine(t_philo	*philo)
+{
+	if (philo->id % 2 == 1)
+		usleep(philo->sim->time_to_eat);
+	eating(philo);
+	ft_print(philo, "is sleeping");
+	waiting(philo, philo->sim->time_to_sleep);
+	ft_print(philo, "is thinking");
+	philo->count_meal++;
+}
+
+void	*init_philo(void *arg)
 {
 	t_philo	*philo;
 
 	philo = (t_philo *)arg;
 	philo->start_time = get_time();
 	philo->last_meal = philo->start_time;
-	while ((philo->count_meal < philo->sim->nbr_meals || !philo->sim->nbr_meals)
-		&& !philo->is_dead)
+	while ((philo->count_meal <= philo->sim->nbr_meals
+			|| philo->sim->nbr_meals == 0) && !philo->is_dead
+		&& philo->sim->eos < philo->sim->nbr_philo)
 	{
-		if (philo->id % 2 == 1)
-			usleep(philo->sim->time_to_eat);
 		if (philo->sim->head == philo->sim->tail)
 		{
 			ft_print(philo, "has taken a fork");
 			waiting(philo, philo->sim->time_to_die + 1);
+			philo->sim->eos++;
+			philo->is_dead = 1;
 			return (NULL);
 		}
 		else
-			eating(philo);
-		ft_print(philo, "is sleeping");
-		waiting(philo, philo->sim->time_to_sleep);
-		ft_print(philo, "is thinking");
+			ft_routine(philo);
 	}
+	philo->sim->eos++;
+	philo->is_dead = 1;
 	return (NULL);
 }
