@@ -17,13 +17,13 @@ void	error_display(int error)
 	if (error == 1)
 		printf("Should have more philo\n");
 	else if (error == 2)
-		printf("Time to die should be between 60 and 2147483647\n");
+		printf("Time to die should be between 4 and 2147483647\n");
 	else if (error == 3)
-		printf("Time to eat should be between 60 and 2147483647\n");
+		printf("Time to eat should be between 2 and 2147483647\n");
 	else if (error == 4)
-		printf("Time to sleep should be between 60 and 2147483647\n");
+		printf("Time to sleep should be between 2 and 2147483647\n");
 	else if (error == 5)
-		printf("Number of meals should be between 60 and 2147483647\n");
+		printf("Number of meals should be between 0 and 2147483647\n");
 	else if (error == 6)
 		printf("bad arguments\n");
 	else if (error == 7)

@@ -40,13 +40,13 @@ int	set_arg(t_arg *arg, char **av)
 	if (arg->nbr_philo <= 0)
 		ret = 1;
 	arg->time_to_die = ft_atoi(av[2]);
-	if (arg->time_to_die <= 59)
+	if (arg->time_to_die <= 3)
 		ret = 2;
 	arg->time_to_eat = ft_atoi(av[3]);
-	if (arg->time_to_eat <= 59)
+	if (arg->time_to_eat <= 1)
 		ret = 3;
 	arg->time_to_sleep = ft_atoi(av[4]);
-	if (arg->time_to_sleep <= 59)
+	if (arg->time_to_sleep <= 1)
 		ret = 4;
 	arg->nbr_meals = 0;
 	if (av[5])

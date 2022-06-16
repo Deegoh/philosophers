@@ -76,7 +76,7 @@ void	*ft_reaper(void *arg)
 void	ft_routine(t_philo	*philo)
 {
 	if (philo->id % 2 == 1)
-		usleep(philo->sim->time_to_eat);
+		usleep(philo->sim->time_to_eat / 2);
 	eating(philo);
 	ft_print(philo, "is sleeping");
 	waiting(philo, philo->sim->time_to_sleep);
@@ -91,6 +91,8 @@ void	*init_philo(void *arg)
 	philo = (t_philo *)arg;
 	philo->start_time = get_time();
 	philo->last_meal = philo->start_time;
+	if (philo->id % 2 == 1)
+		waiting(philo, philo->sim->time_to_eat / 2);
 	while ((philo->count_meal <= philo->sim->nbr_meals
 			|| philo->sim->nbr_meals == 0) && !philo->is_dead
 		&& philo->sim->eos < philo->sim->nbr_philo)
